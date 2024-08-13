@@ -17,7 +17,19 @@ function BreedInfo() {
           throw new Error('Failed to fetch breed data');
         }
         const data = await response.json();
-        setBreeds(data);
+
+        // Fetch images for each breed
+        const breedsWithImages = await Promise.all(data.map(async (breed) => {
+          const imageResponse = await fetch(`https://api.thecatapi.com/v1/images/search?breed_ids=${breed.id}`, {
+            headers: {
+              'x-api-key': import.meta.env.VITE_CAT_API_KEY,
+            },
+          });
+          const imageData = await imageResponse.json();
+          return { ...breed, imageUrl: imageData[0]?.url };
+        }));
+
+        setBreeds(breedsWithImages);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -37,11 +49,15 @@ function BreedInfo() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
         {breeds.map((breed) => (
           <div key={breed.id} style={{ border: '1px solid #ddd', borderRadius: '10px', padding: '15px', backgroundColor: '#fff' }}>
-            <img
-              src={`https://api.thecatapi.com/v1/images/search?breed_ids=${breed.id}`}
-              alt={breed.name}
-              style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }}
-            />
+            {breed.imageUrl ? (
+              <img
+                src={breed.imageUrl}
+                alt={breed.name}
+                style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }}
+              />
+            ) : (
+              <p>No image available</p>
+            )}
             <h2>{breed.name}</h2>
             <p><strong>Origin:</strong> {breed.origin}</p>
             <p><strong>Temperament:</strong> {breed.temperament}</p>
