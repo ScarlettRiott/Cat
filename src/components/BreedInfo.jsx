@@ -38,7 +38,7 @@ function BreedInfo() {
         {breeds.map((breed) => (
           <div key={breed.id} style={{ border: '1px solid #ddd', borderRadius: '10px', padding: '15px', backgroundColor: '#fff' }}>
             <img
-              src={https://api.thecatapi.com/v1/images/search?breed_ids={breed.id}}
+              src={"https://api.thecatapi.com/v1/images/search?breed_ids="{breed.id}}
               alt={breed.name}
               style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }}
             />
